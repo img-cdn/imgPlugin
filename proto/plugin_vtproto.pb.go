@@ -74,17 +74,10 @@ func (m *PluginRequest) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 			dAtA[i] = 0x1a
 		}
 	}
-	if len(m.DestPath) > 0 {
-		i -= len(m.DestPath)
-		copy(dAtA[i:], m.DestPath)
-		i = encodeVarint(dAtA, i, uint64(len(m.DestPath)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.SrcPath) > 0 {
-		i -= len(m.SrcPath)
-		copy(dAtA[i:], m.SrcPath)
-		i = encodeVarint(dAtA, i, uint64(len(m.SrcPath)))
+	if len(m.Image) > 0 {
+		i -= len(m.Image)
+		copy(dAtA[i:], m.Image)
+		i = encodeVarint(dAtA, i, uint64(len(m.Image)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -121,12 +114,22 @@ func (m *PluginReply) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i -= len(m.unknownFields)
 		copy(dAtA[i:], m.unknownFields)
 	}
-	if len(m.Message) > 0 {
-		i -= len(m.Message)
-		copy(dAtA[i:], m.Message)
-		i = encodeVarint(dAtA, i, uint64(len(m.Message)))
+	if len(m.Image) > 0 {
+		i -= len(m.Image)
+		copy(dAtA[i:], m.Image)
+		i = encodeVarint(dAtA, i, uint64(len(m.Image)))
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x12
+	}
+	if m.Status {
+		i--
+		if m.Status {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -148,11 +151,7 @@ func (m *PluginRequest) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.SrcPath)
-	if l > 0 {
-		n += 1 + l + sov(uint64(l))
-	}
-	l = len(m.DestPath)
+	l = len(m.Image)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -179,7 +178,10 @@ func (m *PluginReply) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Message)
+	if m.Status {
+		n += 2
+	}
+	l = len(m.Image)
 	if l > 0 {
 		n += 1 + l + sov(uint64(l))
 	}
@@ -226,9 +228,9 @@ func (m *PluginRequest) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SrcPath", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
 			}
-			var stringLen uint64
+			var byteLen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflow
@@ -238,55 +240,25 @@ func (m *PluginRequest) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				byteLen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if byteLen < 0 {
 				return ErrInvalidLength
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + byteLen
 			if postIndex < 0 {
 				return ErrInvalidLength
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SrcPath = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DestPath", wireType)
+			m.Image = append(m.Image[:0], dAtA[iNdEx:postIndex]...)
+			if m.Image == nil {
+				m.Image = []byte{}
 			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLength
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLength
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DestPath = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -486,10 +458,10 @@ func (m *PluginReply) UnmarshalVT(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
-			var stringLen uint64
+			var v int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflow
@@ -499,23 +471,45 @@ func (m *PluginReply) UnmarshalVT(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				v |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			m.Status = bool(v != 0)
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Image", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
 				return ErrInvalidLength
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + byteLen
 			if postIndex < 0 {
 				return ErrInvalidLength
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Message = string(dAtA[iNdEx:postIndex])
+			m.Image = append(m.Image[:0], dAtA[iNdEx:postIndex]...)
+			if m.Image == nil {
+				m.Image = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

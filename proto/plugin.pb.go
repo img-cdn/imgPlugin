@@ -19,33 +19,51 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type IsSucc int32
+
+const (
+	IsSucc_success IsSucc = 0
+	IsSucc_failed  IsSucc = 1
+)
+
+// Enum value maps for IsSucc.
+var (
+	IsSucc_name = map[int32]string{
+		0: "success",
+		1: "failed",
+	}
+	IsSucc_value = map[string]int32{
+		"success": 0,
+		"failed":  1,
+	}
+)
+
+func (x IsSucc) Enum() *IsSucc {
+	p := new(IsSucc)
+	*p = x
+	return p
+}
+
 type PluginRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SrcPath    string            `protobuf:"bytes,1,opt,name=src_path,json=srcPath,proto3" json:"src_path,omitempty"`
-	DestPath   string            `protobuf:"bytes,2,opt,name=dest_path,json=destPath,proto3" json:"dest_path,omitempty"`
+	Image      []byte            `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
 	Parameters map[string]string `protobuf:"bytes,3,rep,name=parameters,proto3" json:"parameters,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Quality    int32             `protobuf:"varint,4,opt,name=quality,proto3" json:"quality,omitempty"`
+	// Quality ranges from 1 to 100 inclusive, higher is better.
+	Quality int32 `protobuf:"varint,4,opt,name=quality,proto3" json:"quality,omitempty"`
 }
 
 func (x *PluginRequest) ProtoReflect() protoreflect.Message {
 	panic(`not implemented`)
 }
 
-func (x *PluginRequest) GetSrcPath() string {
+func (x *PluginRequest) GetImage() []byte {
 	if x != nil {
-		return x.SrcPath
+		return x.Image
 	}
-	return ""
-}
-
-func (x *PluginRequest) GetDestPath() string {
-	if x != nil {
-		return x.DestPath
-	}
-	return ""
+	return nil
 }
 
 func (x *PluginRequest) GetParameters() map[string]string {
@@ -67,18 +85,26 @@ type PluginReply struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Status bool   `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
+	Image  []byte `protobuf:"bytes,2,opt,name=image,proto3" json:"image,omitempty"`
 }
 
 func (x *PluginReply) ProtoReflect() protoreflect.Message {
 	panic(`not implemented`)
 }
 
-func (x *PluginReply) GetMessage() string {
+func (x *PluginReply) GetStatus() bool {
 	if x != nil {
-		return x.Message
+		return x.Status
 	}
-	return ""
+	return false
+}
+
+func (x *PluginReply) GetImage() []byte {
+	if x != nil {
+		return x.Image
+	}
+	return nil
 }
 
 // go:plugin type=plugin version=1
