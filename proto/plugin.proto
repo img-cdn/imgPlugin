@@ -1,7 +1,7 @@
 syntax = "proto3";
 package imgPlugin;
 
-option go_package = "https://github.com/img-cdn/imgPlugin";
+option go_package = "https://github.com/img-cdn/imgPlugin/proto";
 
 // go:plugin type=plugin version=1
 service Actuator {

@@ -4,9 +4,9 @@
 // versions:
 // 	protoc-gen-go-plugin v0.1.0
 // 	protoc               v3.21.9
-// source: proto/plugin.proto
+// source: plugin.proto
 
-package imgPlugin
+package proto
 
 import (
 	context "context"
