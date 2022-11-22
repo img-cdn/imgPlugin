@@ -6,7 +6,7 @@ import (
 	"context"
 	"github.com/anthonynsimon/bild/effect"
 	"github.com/anthonynsimon/bild/imgio"
-	plugin "imgPlugin/proto"
+	plugin "github.com/img-cdn/imgPlugin/proto"
 )
 
 type greyPlugin struct {
