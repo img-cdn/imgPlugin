@@ -1,4 +1,4 @@
-module imgPlugin
+module github.com/img-cdn/imgPlugin
 
 go 1.19
 
